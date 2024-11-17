@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h1>Lost & Found</h1>
+<p>Thank you for reporting about the found asset</p>
+
+<p id="status"></p>
+<button id="bGetLocation" onclick="getLocation()" style="display:none">Get location</button>
+<div id="in" style="display:none">
+  <label for="message">Personal message to the asset owner:</label>
+  <input id="message" type="text"/>
+  <a id="wa"  href="#">Send SMS</a>
+  <a id="sms" href="#">Send WhatsApp</a>
+</div>
+
+
+<script>
+const result = document.getElementById("status");
+const urlParams = new URLSearchParams(window.location.search);
+var phone = "972544872943"; //urlParams.get('phone');
+getLocation();
+
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition, showError);
+  } else { 
+    result.innerHTML = "Geolocation is not supported by this browser.";
+  }
+}
+
+function showPosition(position) {
+  var lat = position.coords.latitude;
+  var lon = position.coords.longitude;
+  var mapUrl = `https://www.google.com/maps/@${lat},${lon}`;
+  var message = document.getElementById("message").value;
+  if (!message) {
+    message = "Your asset is found and is located here:";
+  }
+  var text = `{message} {mapUrl}`;
+  var encodedText = encodeURIComponent(text); 
+  var waUrl = `https://wa.me/${phone}?text=${encodedText}`;
+  var smsUrl = `sms:+${phone}?body=${encodedText}`;
+  
+  document.getElementById("wa").href = waUrl;
+  document.getElementById("sms").href = smsUrl;
+  document.getElementById("in").style.display = "block";
+}
+
+function showError(error) {
+    const pressButton = "Please press the button 'Get location'";
+    const pressButtonAgain = pressButton + ". Hopefully this time it will work."; 
+    if(error.code == 1) {
+        result.innerHTML = pressButton + " and allow its retrieaval.";
+    } else if(error.code == 2) {
+        result.innerHTML = "The network is down or the positioning service can't be reached. " + pressButtonAgain;
+    } else if(error.code == 3) {
+        result.innerHTML = "The attempt timed out before it could get the location data." + pressButtonAgain;
+    } else {
+        result.innerHTML = "Geolocation failed due to unknown error." + pressButtonAgain;
+    }
+    document.getElementById("bGetLocation").style.display = "block";
+}
+
+
+</script>
+
+</body>
+</html>
+
+
