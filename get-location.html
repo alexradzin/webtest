@@ -1,5 +1,58 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <style>
+      body {
+        max-width: 500px;
+        margin: auto;
+        padding: 10px;fte
+      }    
+      *{
+        margin: 0;
+        padding: 0;
+      }
+      div{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      button{
+        border: none;
+        cursor: pointer;
+        appearance: none;
+        background-color: inherit;
+        transition: transform .7s ease-in-out;
+        margin-left:10px;
+      }
+      button:hover{
+        transform: rotate(360deg);
+      }
+      img{
+        width: 70px;
+        height: 70px;
+      }
+      input[type="textarea"]{
+        padding:10px;
+        border:2px solid #314de4;
+        outline :none;
+        border-radius:5px;
+        font-size:24px;
+        color:#314de4;
+        margin: 10px 0;
+      }
+      .text{
+        width: 100%;
+        border:2px solid #314de4;
+        outline :none;
+        border-radius:5px;
+        font-size:24px;
+        color:#314de4;
+        margin: 10px 0;
+      }
+      
+    </style>
+</head>
+
 <body>
 <h1>Lost & Found</h1>
 <p>Thank you for reporting about the found asset</p>
@@ -7,11 +60,14 @@
 <p id="status"></p>
 <button id="bGetLocation" onclick="return sendLocation(geoPosition)" style="display:none">Get location</button>
 <div id="in" style="display:none">
-  <label for="message">Personal message to the asset owner:</label>
-  <input id="message" type="text"/>
-  <a id="wa"  href="#" onclick="return sendGeoLocation()">Send WhatsApp</a>
-  <a id="wa2"  href="#" onclick="return sendGeoLocation()">Send WhatsApp2</a>
-  <a id="sms" href="#" onclick="return sendGeoLocation()">Send SMS</a>
+  <label for="message"><span>Personal message to the asset owner:</span></label><br/>
+  <!--<input id="message" type="text"/>-->
+  <textarea id="message" rows="5" onInput="autoHeight(this)" class="text"></textarea>
+  
+  <br/><br/>
+  <span>Send:</span>
+  <a id="wa"  href="#" onclick="return sendGeoLocation()"><button type="button"><img src="./images/whatsapp_logo_green.png" alt="WhatsApp"/></button></a>
+  <a id="sms" href="#" onclick="return sendGeoLocation()"><button type="button"><img src="./images/sms.jpeg" alt="SMS"/></button></a>
 </div>
 
 
@@ -23,6 +79,12 @@ var message = "Your asset is found and is located here:";
 var geoPosition = null;
 getLocation();
 
+function autoHeight(textArea) {  /* javascript */
+	var linesCount = textArea.value.split('\n').length;
+	if (linesCount > 5 && linesCount < 10) {
+      textArea.style.height = `${textArea.scrollHeight}px`;
+    }
+}
 
 function getLocation() {
   if (navigator.geolocation) {
@@ -53,11 +115,9 @@ function sendPosition(position) {
   var text = `${message} ${mapUrl}`;
   var encodedText = encodeURIComponent(text); 
   var waUrl = `https://wa.me/${phone}?text=${encodedText}`;
-  var waUrl2 = `https://api.whatsapp.com/send?phone=${phone}&text=${encodedText}`;
   var smsUrl = `sms:+${phone}?body=${encodedText}`;
   
   document.getElementById("wa").href = waUrl;
-  document.getElementById("wa2").href = waUrl2;
   document.getElementById("sms").href = smsUrl;
 }
 
