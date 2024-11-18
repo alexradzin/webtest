@@ -5,45 +5,60 @@
 <p>Thank you for reporting about the found asset</p>
 
 <p id="status"></p>
-<button id="bGetLocation" onclick="getLocation()" style="display:none">Get location</button>
+<button id="bGetLocation" onclick="return sendLocation(geoPosition)" style="display:none">Get location</button>
 <div id="in" style="display:none">
   <label for="message">Personal message to the asset owner:</label>
   <input id="message" type="text"/>
-  <a id="wa"  href="#">Send SMS</a>
-  <a id="sms" href="#">Send WhatsApp</a>
+  <a id="wa"  href="#" onclick="return sendGeoLocation()">Send WhatsApp</a>
+  <a id="wa2"  href="#" onclick="return sendGeoLocation()">Send WhatsApp2</a>
+  <a id="sms" href="#" onclick="return sendGeoLocation()">Send SMS</a>
 </div>
 
 
 <script>
 const result = document.getElementById("status");
 const urlParams = new URLSearchParams(window.location.search);
-var phone = "972544872943"; //urlParams.get('phone');
+var phone = urlParams.get('phone');
+var message = "Your asset is found and is located here:";
+var geoPosition = null;
 getLocation();
+
 
 function getLocation() {
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition, showError);
+    navigator.geolocation.getCurrentPosition(storePosition, showError);
   } else { 
     result.innerHTML = "Geolocation is not supported by this browser.";
   }
 }
 
-function showPosition(position) {
+function storePosition(position) {
+  geoPosition = position;
+  document.getElementById("in").style.display = "block";
+}
+
+function sendGeoLocation() {
+  sendPosition(geoPosition);
+  return true;
+}
+
+function sendPosition(position) {
   var lat = position.coords.latitude;
   var lon = position.coords.longitude;
   var mapUrl = `https://www.google.com/maps/@${lat},${lon}`;
-  var message = document.getElementById("message").value;
-  if (!message) {
-    message = "Your asset is found and is located here:";
+  var customMessage = document.getElementById("message").value;
+  if (customMessage != '') {
+    message = customMessage;
   }
-  var text = `{message} {mapUrl}`;
+  var text = `${message} ${mapUrl}`;
   var encodedText = encodeURIComponent(text); 
   var waUrl = `https://wa.me/${phone}?text=${encodedText}`;
+  var waUrl2 = `https://api.whatsapp.com/send?phone=${phone}&text=${encodedText}`;
   var smsUrl = `sms:+${phone}?body=${encodedText}`;
   
   document.getElementById("wa").href = waUrl;
+  document.getElementById("wa2").href = waUrl2;
   document.getElementById("sms").href = smsUrl;
-  document.getElementById("in").style.display = "block";
 }
 
 function showError(error) {
